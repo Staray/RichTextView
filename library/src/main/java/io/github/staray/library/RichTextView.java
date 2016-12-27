@@ -18,9 +18,9 @@ public class RichTextView extends TextView {
 
     private int mHeight, mWidth;
 
-    private Drawable mDrawable;
-
     private int mLocation;
+
+    private float scale;
 
     public RichTextView(Context context) {
         this(context, null);
@@ -32,9 +32,11 @@ public class RichTextView extends TextView {
         TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.RichTextView);
 
+        scale = context.getResources().getDisplayMetrics().density;
+
         mWidth = a.getDimensionPixelSize(R.styleable.RichTextView_drawable_width, 0);
         mHeight = a.getDimensionPixelSize(R.styleable.RichTextView_drawable_height, 0);
-        mDrawable = a.getDrawable(R.styleable.RichTextView_drawable_src);
+        Drawable mDrawable = a.getDrawable(R.styleable.RichTextView_drawable_src);
         mLocation = a.getInt(R.styleable.RichTextView_drawable_location, TOP);
 
         a.recycle();
@@ -48,6 +50,12 @@ public class RichTextView extends TextView {
     public void drawDrawable(Drawable mDrawable) {
         if (mDrawable != null) {
             Bitmap bitmap = ((BitmapDrawable) mDrawable).getBitmap();
+            drawBitmap(bitmap);
+        }
+    }
+
+    public void drawBitmap(Bitmap bitmap) {
+        if (null != bitmap) {
             Drawable drawable;
             if (mWidth != 0 && mHeight != 0) {
                 drawable = new BitmapDrawable(getResources(), getBitmap(bitmap,
@@ -57,19 +65,45 @@ public class RichTextView extends TextView {
                         bitmap.getHeight(), true));
             }
 
-            if (mLocation == LEFT) {
-                this.setCompoundDrawablesWithIntrinsicBounds(drawable, null,
-                        null, null);
-            } else if (mLocation == TOP) {
-                this.setCompoundDrawablesWithIntrinsicBounds(null, drawable,
-                        null, null);
-            } else if (mLocation == RIGHT) {
-                this.setCompoundDrawablesWithIntrinsicBounds(null, null,
-                        drawable, null);
-            } else if (mLocation == BOTTOM) {
-                this.setCompoundDrawablesWithIntrinsicBounds(null, null, null,
-                        drawable);
-            }
+            showDrawable(drawable);
+        }
+    }
+
+    /**
+     * setting the drawable height by dp
+     *
+     * @param mHeight
+     */
+    public void setmHeight(int mHeight) {
+        this.mHeight = (int) (mHeight * scale);
+    }
+
+    /**
+     * setting the drawable width by dp
+     *
+     * @param mWidth
+     */
+    public void setmWidth(int mWidth) {
+        this.mWidth = (int) (mWidth * scale);
+    }
+
+    public void setmLocation(int mLocation) {
+        this.mLocation = mLocation;
+    }
+
+    private void showDrawable(Drawable drawable) {
+        if (mLocation == LEFT) {
+            this.setCompoundDrawablesWithIntrinsicBounds(drawable, null,
+                    null, null);
+        } else if (mLocation == TOP) {
+            this.setCompoundDrawablesWithIntrinsicBounds(null, drawable,
+                    null, null);
+        } else if (mLocation == RIGHT) {
+            this.setCompoundDrawablesWithIntrinsicBounds(null, null,
+                    drawable, null);
+        } else if (mLocation == BOTTOM) {
+            this.setCompoundDrawablesWithIntrinsicBounds(null, null, null,
+                    drawable);
         }
     }
 
